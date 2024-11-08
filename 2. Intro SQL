@@ -1,0 +1,44 @@
+SQL data types:
+
+Numeric Types:
+INT or INTEGER: Whole numbers (e.g., 1, 100, -5)
+DECIMAL(p,s) or NUMERIC(p,s): Exact decimal numbers (e.g., for money)
+FLOAT: Floating-point numbers
+SMALLINT: Small range integers
+BIGINT: Large range integers
+
+String/Character Types:
+VARCHAR(n): Variable-length string with max length n
+CHAR(n): Fixed-length string
+TEXT: Variable unlimited length text
+
+Date and Time Types:
+DATE: Date only (YYYY-MM-DD)
+TIME: Time only (HH:MM:SS)
+TIMESTAMP: Both date and time
+DATETIME: Date and time combination
+
+Boolean Type:
+BOOLEAN or BOOL: True/False values
+
+
+Binary Types:
+BLOB: Binary Large Object
+BINARY: Fixed-length binary data
+VARBINARY: Variable-length binary data
+
+Most Frequently Used:
+INT: For IDs, counts, ages
+VARCHAR: For names, addresses, variable text
+DATE/TIMESTAMP: For dates and timestamps
+DECIMAL: For precise monetary values
+BOOLEAN: For yes/no flags
+
+Best Practices:
+Use INT for primary keys/IDs
+Use VARCHAR instead of CHAR for variable text
+Use DECIMAL for financial calculations
+Use TIMESTAMP for audit trails/logging
+Use appropriate size limits to optimize storage
+
+
