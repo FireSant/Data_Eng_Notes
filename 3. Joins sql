@@ -1,0 +1,87 @@
+INNER JOIN
+Returns only matching records from both tables
+Only shows records where the join condition is met
+
+LEFT JOIN (LEFT OUTER JOIN):
+Returns all records from left table and matching from right
+
+RIGHT JOIN (RIGHT OUTER JOIN):
+Returns all records from right table and matching from left
+
+FULL JOIN (FULL OUTER JOIN):
+Returns all records from both tables
+Shows all records regardless of matches
+Join order matters for performance:
+
+Start with the tables containing the most filtered data
+Join smaller tables before larger ones when possible
+
+Use appropriate join types based on your needs:
+INNER JOIN when you need matching records only
+LEFT/RIGHT JOIN when you need all records from one side
+FULL JOIN when you need all records from both sides
+
+SELF JOIN (Self Inner Join):
+Table is joined with itself
+Useful for hierarchical or recursive data (like employee-manager relationships)
+Need to use aliases to distinguish between the same table
+Most commonly used as INNER JOIN but can be LEFT/RIGHT JOIN too
+
+CROSS JOIN:
+Creates a Cartesian product - combines each row from first table with every row from second table
+Results in N × M rows (where N = rows in first table, M = rows in second table)
+Doesn't need a join condition (ON clause)
+
+Common Use Cases:
+CROSS JOIN:
+Creating combinations of items
+Generating test data
+Creating a multiplication table
+SELF JOIN:
+Organizational hierarchies
+Finding pairs/relationships within same table
+Comparing rows within same table
+
+
+UNION:
+Combines results of two or more SELECT statements
+Removes duplicate rows
+Orders/sorts the results
+Slower than UNION ALL due to duplicate removal
+
+UNION ALL:
+Combines all results, including duplicates
+Faster than UNION (no duplicate removal)
+Doesn't sort results
+Uses less CPU resources
+
+Key Rules for Both:
+Same number of columns in each SELECT
+Similar data types in corresponding columns
+Column order must match
+
+Best Practices:
+
+Use UNION ALL when:
+Duplicates are acceptable
+Performance is critical
+You know there are no duplicates
+You want to preserve all records
+
+Use UNION when:
+Duplicates must be removed
+Order is important
+Data cleanliness is priority
+
+
+INTERSECT:
+Returns only common records between two queries
+EXCEPT:
+Returns records from first query that don't exist in second query
+Key Points:
+Both remove duplicates
+Data types must match in corresponding columns
+EXCEPT order matters (INTERSECT order doesn't matter)
+Both are set operations like UNION but:
+INTERSECT = common elements
+EXCEPT = elements in first set but not in second
