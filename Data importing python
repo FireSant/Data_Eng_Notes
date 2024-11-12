@@ -1,0 +1,31 @@
+Attributes, Methods, and Functions: A Breakdown
+
+In object-oriented programming (OOP), these terms are fundamental concepts used to define the structure and behavior of objects.
+
+Attributes
+Definition: Attributes are characteristics or properties of an object. They represent the data associated with an object.
+Analogy: Think of attributes as the nouns that describe an object.
+Example: For a "Car" object, attributes might include:
+color
+model
+year
+mileage
+
+Methods
+Definition: Methods are functions that are associated with an object. They define the actions or behaviors that an object can perform.
+Analogy: Think of methods as the verbs that describe what an object can do.
+Example: For a "Car" object, methods might include:
+start()
+stop()
+accelerate()
+brake()
+
+Functions
+Definition: Functions are blocks of code that perform specific tasks. They can be defined independently of objects and classes.
+Analogy: Think of functions as tools that can be used to perform specific operations.
+Example: A function to calculate the factorial of a number, or a function to sort a list of numbers.
+
+
+
+
+APIS json's
