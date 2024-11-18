@@ -12,13 +12,294 @@ dataframe['column'] = dataframe['column'].astype('new_type')
 # Convert 'age' column to integer
   df['age'] = df['age'].astype('int')
 
-# Handle mixed numeric data with errors='coerce'
-  df['age'] = pd.to_numeric(df['age'], errors='coerce')
+  # 1. Removing Extra Whitespace
+  df['Name'] = df['Name'].str.strip()
+  
+  # 2. Converting to Uppercase or Lowercase
+  df['Name'] = df['Name'].str.upper()
+  
+  # 3. Splitting Strings
+  df['First_Name'], df['Last_Name'] = df['Name'].str.split(' ', 1).str
+  df.drop('Name', axis=1, inplace=True)
+  
+  # 4. Replacing Specific Characters
+  df['Email'] = df['Email'].str.replace('@', '_')
+  
+  # 5. Handling Missing Values
+  # Assuming 'Age' column has missing values
+  df['Age'] = df['Age'].fillna(df['Age'].mean())
+
+
+# Convert with coerce - converts errors to NaN
+  df['numbers'] = pd.to_numeric(df['numbers'], errors='coerce')
+
+    DATA CLEANING WITH COERCE
+         def clean_numeric_column(df, column):
+        """
+        Clean a numeric column by:
+        1. Converting to numeric with coerce
+        2. Identifying converted NaN values
+        3. Filling NaN with median or other strategy
+        """
+        # Convert to numeric
+        df[column] = pd.to_numeric(df[column], errors='coerce')
+        
+        # Count NaN values
+        nan_count = df[column].isna().sum()
+        print(f"Converted {nan_count} invalid values to NaN")
+        
+        # Fill NaN with median
+        df[column] = df[column].fillna(df[column].median())
+        
+        return df
+  
+      # Example usage
+      data = {
+          'sales': ['1000', '2000', 'error', '3000', 'invalid', '4000'],
+          'quantity': ['10', '20', '30', 'bad_data', '50', '60']
+      }
+      df = pd.DataFrame(data)
+      df = clean_numeric_column(df, 'sales')
+
+ANOTHER .COERCE EXAMPLE
+        df = pd.DataFrame({
+        'dates': ['2023-01-01', 'invalid_date', '2023-02-01', 'error']
+    })
+    
+    # Convert to datetime with coerce
+    df['dates'] = pd.to_datetime(df['dates'], errors='coerce')
+
+
 # Create sample DataFrame with missing values
   df = pd.DataFrame({'name': ['John', 'Anna', 'Peter', 'Emily'], 'age': [25, None, 35, None]})
 
 # Check for missing values
   print(df.isnull().sum())
+
 # Fill missing 'age' values with the mean
   df['age'] = df['age'].fillna(df['age'].mean())
+
+# Rename a column
+  df = df.rename(columns={'age': 'employee_age'})
+
+# Drop a column
+  df = df.drop('employee_age', axis=1)
+
+# Replace 'NaN' with 'Unknown'
+  df['name'] = df['name'].replace('NaN', 'Unknown')
+
+# Remove '$' from 'salary' column
+  df['salary'] = df['salary'].str.replace('$', '')
+
+
+DUPLICATED CONSTRAINTS 
+
+df.duplicated(subset=None, keep='first')
+  
+  subset: A list of columns to consider for duplication. If None, all columns are considered.
+  keep: Specifies which duplicates to mark as False:
+  'first': Marks all duplicates as True except the first occurrence.
+  'last': Marks all duplicates as True except the last occurrence.
+   False: Marks all duplicates as True. (not discarding any duplicate returns all duplicated rows.)
+        
+        # Find duplicates
+        duplicates = ride_sharing.duplicated(['ride_id'], keep=False)
+        
+        # Sort your duplicated rides
+        duplicated_rides = ride_sharing[duplicates].sort_values('ride_id')
+        
+        # Print relevant columns of duplicated_rides
+        print(duplicated_rides[['ride_id','duration','user_birth_year']])
+        
+
+  .drop_duplicates()
+  Purpose: Removes duplicate rows based on specified columns.
+
+  Syntax: df.drop_duplicates(subset=None, keep='first', inplace=False)
+  subset, keep, and inplace parameters have the same meaning as in .duplicated().
+  inplace: If True, modifies the DataFrame in-place, otherwise returns a new DataFrame.
+
+          # Remove duplicate rows based on all columns
+          df_no_duplicates = df.drop_duplicates()
+          print(df_no_duplicates)
+          
+          # Remove duplicate rows based on the 'Name' column, keeping the first occurrence
+          df_unique_names = df.drop_duplicates(subset='Name', keep='first')   
+          
+          print(df_unique_names)
+
+  HANDLING DUPLICATED VALUES WITH .groupby() and .agg()
+    
+    # Group by column names and produce statistical summaries
+    column_names = ['first_name', 'last_name', 'address']
+    summaries = {'height': 'max', 'weight': 'mean'}
+    
+    height_weight = height_weight.groupby(by=column_names).agg(summaries).reset_index()
+    
+    # Make sure aggregation is done
+    duplicates = height_weight.duplicated(subset=column_names, keep=False)
+    
+    height_weight[duplicates].sort_values(by='first_name')   
+
+
+
+MEMBERSHIP CONSTRAINTS
+  
+  inconsistent_categories = set(study_data['blood_type']).difference(categories['blood_type'])
+  print(inconsistent_categories)
+    set(study_data['blood_type']): This creates a set of unique blood types present in the study_data DataFrame.
+    categories['blood_type']: This accesses a list of valid blood types from the categories DataFrame.
+    .difference(): This method calculates the set difference, resulting in a set of blood types that are present in study_data 
+      but not in categories.
+    print(inconsistent_categories): This prints the set of inconsistent blood types to the console.
+
+  inconsistent_rows = study_data['blood_type'].isin(inconsistent_categories)
+  study_data[inconsistent_rows]   #study_data[~inconsistent_rows]  #for inverting and print the other results
+    study_data['blood_type'].isin(inconsistent_categories): This checks if each blood type in the study_data DataFrame is present 
+      in the inconsistent_categories set. It returns a boolean array where True indicates an inconsistent blood type.
+    study_data[inconsistent_rows]: This filters the study_data DataFrame using the boolean array, selecting only the rows with 
+      inconsistent blood types.
+    print(study_data[inconsistent_rows]): This prints the filtered DataFrame to the console, displaying the rows with inconsistent 
+      blood types.
+  
+  .unique() method is a powerful tool for extracting unique values from a Series or DataFrame column. It returns an array of unique values, 
+  sorted in the order they appear in the original Series or DataFrame.
+          data = {'Name': ['Alice', 'Bob', 'Alice', 'David'],
+                'Age': [25, 30, 25, 28]}
+        df = pd.DataFrame(data)
+        
+        # Get unique names
+        unique_names = df['Name'].unique()
+        print(unique_names)  # Output: ['Alice' 'Bob' 'David']
+        
+        # Get unique ages
+        unique_ages = df['Age'].unique()
+
+
+.cut()
+
+    # Create ranges for categories
+    label_ranges = [0, 60, 180, np.inf]
+    label_names = ['short', 'medium', 'long']
+    
+    # Create wait_type column
+    airlines['wait_type'] = pd.cut(airlines['wait_min'], bins = label_ranges, 
+                                                          labels = label_names)
+
+    pd.cut(): This function is used to bin continuous variables into discrete intervals. Like categories
+    airlines['wait_min']: The column to be categorized.
+    bins=label_ranges: Specifies the bin edges. It could be numbers too. (e.g: 3. It means 3 intervals)
+    labels=label_names: Assigns labels to the corresponding bins.
+
+
+
+
+UNIFORMITY
+  Uniformity in Datasets and Data Cleaning Techniques
+  Uniformity in a dataset refers to the consistency and coherence of its data. This includes:
+    Data Types: Ensuring that all values in a column belong to the same data type (e.g., all numbers are numeric, all text is string).
+    Units of Measurement: Using consistent units across different columns or datasets (e.g., all distances in meters, all weights in kilograms).
+    Data Formats: Adhering to a specific format for dates, times, and other structured data.
+    Encoding: Using a consistent encoding scheme for text data (e.g., UTF-8).
+
+
+Date formating in Data cleaning
+
+  FOR DATA ACCESSING
+    df['year'] = df['date_column'].dt.year
+    df['month'] = df['date_column'].dt.month
+    df['day'] = df['date_column'].dt.day
+
+    df['Year'] = df['Date'].dt.strftime('%Y')     # useful when you want to extract specific parts of a datetime, such as the year, month, day, or time.
+          Year: %Y (4-digit year), %y (2-digit year)
+          Month: %B (full month name), %m (2-digit month number), %b (abbreviated month name)
+          Day: %d (2-digit day of the month)
+          Time: %H (24-hour hour), %I (12-hour hour), %M (minute), %S (second)
+          Weekday: %A (full weekday name), %a (abbreviated weekday name)
+  FOR DATA MANIPULATING
+  df['date'] = pd.to_datetime(df['date_str'])
+  
+  df['date'] = pd.to_datetime(df['date_str'], format='%Y-%m-%d')  # Explicit format
+  df['date'] = pd.to_datetime(df['date_str'], infer_datetime_format=True)  # Infer format
+  df['date'] = pd.to_datetime(df['date_str'], errors='coerce') #replace the invalid date values to NaN
+
+
+CROSS CONFIRMING
+
+  Through simple adding
+    # Store fund columns to sum against
+    fund_columns = ['fund_A', 'fund_B', 'fund_C', 'fund_D']
+    
+    # Find rows where fund_columns row sum == inv_amount
+    inv_equ = banking[fund_columns].sum(axis=1) == banking['inv_amount']
+    
+    # Store consistent and inconsistent data
+    consistent_inv = banking[~inv_equ]
+    inconsistent_inv = banking[inv_equ]
+    
+    # Store consistent and inconsistent data
+    print("Number of inconsistent investments: ", inconsistent_inv.shape[0])
+
+   By comparing ayes and using dt. 
+    # Store today's date and find ages
+    today = dt.date.today()
+    ages_manual = today.year - banking['birth_date'].dt.year
+    
+    # Find rows where age column == ages_manual
+    age_equ = banking['age'] == ages_manual
+    
+    # Store consistent and inconsistent data
+    consistent_ages = banking[age_equ]
+    inconsistent_ages = banking[~age_equ]
+    
+    # Store consistent and inconsistent data
+    print("Number of inconsistent ages: ", inconsistent_ages.shape[0])
+
+
+
+
+COMPLETENESS
+  
+  Data Completeness and Missingness Types
+  Data completeness refers to the extent to which a dataset contains all necessary information. In other words, it measures how much
+  data is missing from a dataset.
+  
+  Missingness Types
+    Missing Completely At Random (MCAR):
+    Missingness is unrelated to observed or unobserved data.
+    Example: Data entry errors or random equipment failures.
+  Missing At Random (MAR):
+    Missingness is related to observed data but not unobserved data.
+    Example: Missing ozone data for high temperatures. The missingness is related to the temperature, an observed variable.
+  Missing Not At Random (MNAR):
+    Missingness is related to unobserved data.
+    Example: Missing temperature data for high temperatures. The missingness is related to the missing temperature itself.
+ 
+  Impact of Missing Data
+    Missing data can significantly impact the quality and reliability of data analysis. It can:
+      Reduce statistical power: Fewer data points can lead to less precise estimates.
+      Introduce bias: If missingness is not handled properly, it can lead to biased results.
+      Limit the scope of analysis: Certain analyses may not be feasible with missing data.
+      Strategies for Handling Missing Data
+  
+  The appropriate strategy for handling missing data depends on the type of missingness and the specific analysis goals.
+  Here are some common approaches:
+  
+  Deletion:
+  Listwise deletion: Remove entire rows with missing values.
+  Pairwise deletion: Remove cases with missing values only for specific analyses.
+  Suitable for MCAR data, but can lead to loss of information.
+  
+  Imputation:
+  Mean/Median Imputation: Replace missing values with the mean or median of the variable.
+  Mode Imputation: Replace missing categorical values with the most frequent category.
+  Regression Imputation: Predict missing values based on other variables.
+  Multiple Imputation: Create multiple imputed datasets and combine the results.
+  Suitable for MAR data, but can introduce bias if not handled carefully.
+  
+  Sensitivity Analysis:
+  Assess the impact of different missing data handling methods on the results.
+  Can help identify the most robust approach.
+
+
 
