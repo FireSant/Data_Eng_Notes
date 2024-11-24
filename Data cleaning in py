@@ -302,4 +302,103 @@ COMPLETENESS
   Can help identify the most robust approach.
 
 
+      # Print number of missing values in banking
+      print(banking.isna().sum())
+      
+      # Visualize missingness matrix
+      msno.matrix(banking)
+      plt.show()
+      
+      # Isolate missing and non missing values of inv_amount
+      missing_investors = banking[banking['inv_amount'].isna()]
+      investors = banking[~banking['inv_amount'].isna()]
 
+      # Sort banking by age and visualize
+      banking_sorted = banking.sort_values(by= 'age') 
+      msno.matrix(banking_sorted)
+      plt.show()
+
+  THEN FOR FILLING NULL VALUES, IN THIS CASE 
+    In this exercise, you're working with another version of the banking DataFrame that contains missing 
+    values for both the cust_id column and the acct_amount column.
+    You want to produce analysis on how many unique customers the bank has, the average amount held by customers 
+    and more. You know that rows with missing cust_id don't really help you, and that on average acct_amount is 
+    usually 5 times the amount of inv_amount.
+    In this exercise, you will drop rows of banking with missing cust_ids, and impute missing values of acct_amount
+    with some domain knowledge.
+        
+      # Drop missing values of cust_id
+      banking_fullid = banking.dropna(subset = ['cust_id'])
+      
+      # Compute estimated acct_amount
+      acct_imp = (banking_fullid['inv_amount']*5)
+      
+      # Impute missing acct_amount with corresponding acct_imp
+      banking_imputed = banking_fullid.fillna({'acct_amount':acct_imp})
+      
+      # Print number of missing values
+      print(banking_imputed.isna().sum())
+
+
+
+FOR REMAPPING CATEGORIES
+    
+    # Iterate through categories
+    for cuisine in ['italian', 'asian', 'american']:  
+      # Create a list of matches, comparing cuisine with the cuisine_type column
+      matches = process.extract(cuisine, restaurants['cuisine_type'], limit=len(restaurants.cuisine_type))
+    
+      # Iterate through the list of matches
+      for match in matches:
+         # Check whether the similarity score is greater than or equal to 80
+        if match[1] >= 80:
+          # If it is, select all rows where the cuisine_type is spelled this way, and set them to the correct cuisine
+          restaurants.loc[restaurants['cuisine_type'] == match[0]] = cuisine
+          
+    # Inspect the final result
+    print(restaurants['cuisine_type'].unique())
+
+
+
+LINKING PAIRS
+    
+    # Create an indexer and object and find possible pairs
+    indexer = recordlinkage.Index()
+    
+    # Block pairing on cuisine_type
+    indexer.block('cuisine_type')
+    
+    # Generate pairs
+    pairs = indexer.index(restaurants, restaurants_new) 
+
+  NOW FOR COMPARING PARTS
+
+    # Create a comparison object
+    comp_cl = recordlinkage.Compare()
+    
+    # Find exact matches on city, cuisine_types - 
+    comp_cl.exact('city', 'city', label='city')
+    comp_cl.exact('cuisine_type', 'cuisine_type', label='cuisine_type')
+    
+    # Find similar matches of rest_name
+    comp_cl.string('rest_name', 'rest_name', label='name', threshold = 0.8) 
+    
+    # Get potential matches and print
+    potential_matches = comp_cl.compute(pairs, restaurants, restaurants_new)
+    print(potential_matches.describe())
+
+
+
+LINKING INDEX
+    # Isolate potential matches with row sum >=3
+    matches = potential_matches[potential_matches.sum(axis=1) >= 3]
+    
+    # Get values of second column index of matches
+    matching_indices = matches.index.get_level_values(1)
+    
+    # Subset restaurants_new based on non-duplicate values
+    non_dup = restaurants_new[~restaurants_new.index.isin(matching_indices)]
+    
+    # Append non_dup to restaurants
+    full_restaurants = restaurants.append(restaurants_new)
+    print(full_restaurants)
